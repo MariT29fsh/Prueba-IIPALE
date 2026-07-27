@@ -1,8 +1,8 @@
 import {
-    Button,
-    Dialog,
-    DialogContent,
-    FormControl,
+  Button,
+  Dialog,
+  DialogContent,
+  FormControl,
   Grid,
   IconButton,
   Menu,
@@ -21,17 +21,16 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { obtenerOrdenes } from "../peticiones/ordenes";
 import CircularProgress from "@mui/material/CircularProgress";
 
-
 const Home = () => {
   const [listaOrdenes, setListaOrdenes] = useState([]);
-  const [listaOrdenesFiltro, setListaOrdenesFiltro]= useState([]);
+  const [listaOrdenesFiltro, setListaOrdenesFiltro] = useState([]);
   const [datosCargados, setDatosCargados] = useState(false);
-  const [textoIngresado, setTextoIngresado]= useState("");
-  const [estadoSeleccionado, setEstadoSelecccionado]= useState(0);
-  const [usuarioIngresado,setUsuarioIngresado]= useState("");
-  const [mostrarModal, setMostrarModal]= useState(false);
-  const [idSeleccionado,setIdSeleccionado]= useState(0);
-  const [filaSeleccionada, setFilaSeleccionada]= useState({});
+  const [textoIngresado, setTextoIngresado] = useState("");
+  const [estadoSeleccionado, setEstadoSelecccionado] = useState(0);
+  const [usuarioIngresado, setUsuarioIngresado] = useState("");
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [idSeleccionado, setIdSeleccionado] = useState(0);
+  const [filaSeleccionada, setFilaSeleccionada] = useState({});
 
   const obtenerListaOrdenes = async () => {
     debugger;
@@ -39,73 +38,87 @@ const Home = () => {
     if (respuesta.status === 200) {
       console.log(respuesta);
       setDatosCargados(true);
-      const datosObtenidos= respuesta.data;
+      const datosObtenidos = respuesta.data;
       setListaOrdenes(datosObtenidos);
-      setListaOrdenesFiltro(datosObtenidos)
+      setListaOrdenesFiltro(datosObtenidos);
     } else {
       console.log("Existe un error");
       console.log(respuesta);
     }
   };
-  const manejarListaOrdenesSegFiltro=(e)=>{
-    debugger
-    const {name,value}=e.target;
+  const manejarListaOrdenesSegFiltro = (e) => {
+    debugger;
+    const { name, value } = e.target;
 
-    if(listaOrdenes.length>0){
-        let listaActualizada=[];
-        switch(name){
-            case "texto":
-                setTextoIngresado(value);
-                buscarFiltro(value);
-                break;
-            case "usuario":
-                setUsuarioIngresado(value);
-                listaActualizada= listaOrdenes.filter((o)=> o.userId === parseInt(value));
-                setListaOrdenesFiltro(listaActualizada);
-                break;
-            case "estado":
-                setEstadoSelecccionado(value);
-                const valorLista= value===1?"shipped": value===2?"created":"delivered";
-                if(value!=0){
-                    listaActualizada= listaOrdenes.filter((o)=> o.status === valorLista);
-                    setListaOrdenesFiltro(listaActualizada);
-                }
-                else{
-                    setListaOrdenesFiltro(listaOrdenes);
-                }
-                
-                break;
-                    }
+    if (listaOrdenes.length > 0) {
+      let listaActualizada = [];
+      switch (name) {
+        case "texto":
+          setTextoIngresado(value);
+          buscarFiltro(value);
+          break;
+        case "usuario":
+          setUsuarioIngresado(value);
+          listaActualizada = listaOrdenes.filter(
+            (o) => o.userId === parseInt(value),
+          );
+          setListaOrdenesFiltro(listaActualizada);
+          break;
+        case "estado":
+          setEstadoSelecccionado(value);
+          const valorLista =
+            value === 1 ? "shipped" : value === 2 ? "created" : "delivered";
+          if (value != 0) {
+            listaActualizada = listaOrdenes.filter(
+              (o) => o.status === valorLista,
+            );
+            setListaOrdenesFiltro(listaActualizada);
+          } else {
+            setListaOrdenesFiltro(listaOrdenes);
+          }
+
+          break;
+      }
     }
-
-  }
-  const buscarFiltro=(value)=>{
-    debugger
-     if (value === "") { return; }
-     const estadoNumero= estadoSeleccionado===1?"shipped": estadoSeleccionado===2?"created": estadoSeleccionado===3?"delivered":"";
-        const filtrarSegunTexto = listaOrdenes.filter((item) => 
-        (item.userId.toString().toLowerCase().includes(value.toLowerCase()) ||
-    item.status.includes(value.toLowerCase()) || 
-    (item.total).toString().toLowerCase().includes(value.toLowerCase())) )
-        setListaOrdenesFiltro(filtrarSegunTexto);
-  }
-  const mostrarDetalle=(codigo)=>{
-    debugger
+  };
+  const buscarFiltro = (value) => {
+    debugger;
+    if (value === "") {
+      return;
+    }
+    const estadoNumero =
+      estadoSeleccionado === 1
+        ? "shipped"
+        : estadoSeleccionado === 2
+          ? "created"
+          : estadoSeleccionado === 3
+            ? "delivered"
+            : "";
+    const filtrarSegunTexto = listaOrdenes.filter(
+      (item) =>
+        item.userId.toString().toLowerCase().includes(value.toLowerCase()) ||
+        item.status.includes(value.toLowerCase()) ||
+        item.total.toString().toLowerCase().includes(value.toLowerCase()),
+    );
+    setListaOrdenesFiltro(filtrarSegunTexto);
+  };
+  const mostrarDetalle = (codigo) => {
+    debugger;
     setMostrarModal(true);
-    const datoSeleccionado= listaOrdenes.filter((o)=> o.id=== codigo);
+    const datoSeleccionado = listaOrdenes.filter((o) => o.id === codigo);
     setIdSeleccionado(codigo);
     setFilaSeleccionada(datoSeleccionado[0]);
-  }
-  const cerrarModal=()=>{
+  };
+  const cerrarModal = () => {
     setMostrarModal(false);
-  }
+  };
 
   useEffect(() => {
     obtenerListaOrdenes();
   }, []);
-  useEffect(()=>{
+  useEffect(() => {
     setDatosCargados(true);
-  },[estadoSeleccionado])
+  }, [estadoSeleccionado]);
 
   return (
     <Grid size={12}>
@@ -118,21 +131,21 @@ const Home = () => {
         sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
       >
         <FormControl>
-            <Grid size={4} sx={{ px: 2 }}>
-          <Typography>Texto</Typography>
-          <TextField
-          name="texto"
-            size="small"
-            value={textoIngresado}
-            onChange={manejarListaOrdenesSegFiltro}
-          />
-        </Grid>
+          <Grid size={4} sx={{ px: 2 }}>
+            <Typography>Texto</Typography>
+            <TextField
+              name="texto"
+              size="small"
+              value={textoIngresado}
+              onChange={manejarListaOrdenesSegFiltro}
+            />
+          </Grid>
         </FormControl>
-        
+
         <Grid size={4} sx={{ px: 2 }}>
           <Typography>Usuario</Typography>
           <TextField
-          name="usuario"
+            name="usuario"
             size="small"
             value={usuarioIngresado}
             onChange={manejarListaOrdenesSegFiltro}
@@ -154,7 +167,6 @@ const Home = () => {
             <MenuItem value={1}>shipped</MenuItem>
             <MenuItem value={2}>created</MenuItem>
             <MenuItem value={3}>delivered</MenuItem>
-            
           </Select>
         </Grid>
       </Grid>
@@ -178,18 +190,22 @@ const Home = () => {
                     <TableCell>{item.userId}</TableCell>
                     <TableCell>{item.status}</TableCell>
                     <TableCell>{item.total}</TableCell>
-                    <TableCell><Button variant="contained" onClick={() => mostrarDetalle(item.id)}>
-                          Mas Info</Button>
-                          </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        onClick={() => mostrarDetalle(item.id)}
+                      >
+                        Mas Info
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                    <TableCell colSpan={4}>
-                        <Typography align="center">No hay datos</Typography>
-                    </TableCell>
+                  <TableCell colSpan={4}>
+                    <Typography align="center">No hay datos</Typography>
+                  </TableCell>
                 </TableRow>
-                
               )
             ) : (
               <TableRow>
@@ -212,26 +228,33 @@ const Home = () => {
           </TableBody>
         </Table>
       </Grid>
-      <Dialog 
-            onClose={cerrarModal} 
-                    open={mostrarModal} maxWidth={"sm"} fullWidth={true} >
-                    <DialogContent >
-                       <Grid container  >
-                          <Grid size={12} sx={{ display: "flex", flexDirection: "row", justifyContent: "space-around", flexWrap:"wrap", }} spacing={2}>
-                             <Grid size={12}>
-                                <Typography>Informacion</Typography>
-                                <Typography>{filaSeleccionada.total}</Typography>
-                             </Grid>
-                             
-                          </Grid>
-                       </Grid>
-        
-                    </DialogContent >
-        
-                 </Dialog>
+      <Dialog
+        onClose={cerrarModal}
+        open={mostrarModal}
+        maxWidth={"sm"}
+        fullWidth={true}
+      >
+        <DialogContent>
+          <Grid container>
+            <Grid
+              size={12}
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-around",
+                flexWrap: "wrap",
+              }}
+              spacing={2}
+            >
+              <Grid size={12}>
+                <Typography>Informacion</Typography>
+                <Typography>{filaSeleccionada.total}</Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+      </Dialog>
     </Grid>
-    
   );
-  
 };
 export default Home;
